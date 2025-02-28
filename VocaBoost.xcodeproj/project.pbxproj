@@ -48,6 +48,7 @@
 			isa = PBXGroup;
 			children = (
 				789066062D7044AA00B6A43F /* VocaBoost */,
+				78EE3F972D71700600978B0D /* New Group */,
 				789066052D7044AA00B6A43F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,6 +59,13 @@
 				789066042D7044AA00B6A43F /* VocaBoost.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		78EE3F972D71700600978B0D /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -278,6 +286,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"VocaBoost/Preview Content\"";
 				DEVELOPMENT_TEAM = 64RYND2P4H;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/VocaBoost/Framework",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -307,6 +319,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"VocaBoost/Preview Content\"";
 				DEVELOPMENT_TEAM = 64RYND2P4H;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/VocaBoost/Framework",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
