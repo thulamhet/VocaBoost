@@ -160,7 +160,17 @@ struct ContentView: View {
             let url = "\(apiDictionaryUrl)\(word.lowercased())"
             let data = try await NetworkManager.shared.request(url: url)
             let jsonString = String(data: data, encoding: .utf8) ?? "Invalid Data"
-            print(jsonString)
+            
+            
+            do {
+                let decoder = JSONDecoder()
+                let words = try decoder.decode([WordModel].self, from: data)
+                print(words)
+            } catch {
+                print("Error decoding JSON: \(error)")
+            }
+
+            
         } catch {
             dump(error)
         }
