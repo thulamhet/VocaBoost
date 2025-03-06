@@ -14,6 +14,14 @@ struct WordModel: Codable {
     let license: License
     let sourceUrls: [String]
     
+    var meaning: String {
+        meanings.first?.definitions.first?.definition ?? ""
+    }
+    
+    var type: String {
+        meanings.first?.partOfSpeech ?? ""
+    }
+    
     init(_ json: JSON) {
         self.word = json.word
         self.phonetic = json.phonetic

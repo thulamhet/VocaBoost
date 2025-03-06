@@ -8,5 +8,8 @@
 struct Instrument: Decodable, Identifiable, Encodable {
     let id: Int
     let name: String
+    let type: String?
+    let phonetic: String?
+    let meaning: String?
 }
 

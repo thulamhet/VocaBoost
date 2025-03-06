@@ -10,9 +10,11 @@ import Supabase
 import AVFoundation
 
 struct ContentView: View {
-    @State private var instruments: [Instrument] = []
+    @State private var vocabulary: [Instrument] = []
     @State private var isLoading: Bool = false
     @State private var dataInput: String = ""
+    @State private var currentWord: WordModel = .init(.null)
+    
     private let synthesizer = AVSpeechSynthesizer()
     
     var body: some View {
@@ -20,9 +22,13 @@ struct ContentView: View {
             VStack {
                 TextField("abc", text: $dataInput).padding()
                 
-                List(instruments) { instrument in
+                List(vocabulary) { word in
                     HStack {
-                        Text(instrument.name)
+                        Button(action: {
+                            
+                        }) {
+                            Text(word.name + " " + (word.phonetic ?? "")).foregroundColor(.black)
+                        }
                         
                         Spacer()
                         
@@ -30,10 +36,9 @@ struct ContentView: View {
                             .font(.none)
                             .foregroundColor(.blue)
                             .onTapGesture {
-                                speak(instrument.name)
+                                speak(word.name)
                             }
                     }
-
                 }
                 .listRowSeparator(.hidden)
                 .overlay {
@@ -42,48 +47,59 @@ struct ContentView: View {
                     }
                 }
                 .task {
-                    await fetchInstruments()
+                    await fetchVocabulary()
                 }
                 .safeAreaInset(edge: .bottom) {
-                    HStack {
-                        Button("insert") {
-                            let random = Int.random(in: 1...100)
-                            let ins: Instrument = .init(id: random, name: dataInput)
-                            Task {
-                                await insertInstrument(ins)
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        
-                        Button("update") {
+                    VStack {
+                        Button("reload") {
                             isLoading = true
                             defer { isLoading = false }
                             
                             Task {
-                                await updateData()
+                                await fetchVocabulary()
                             }
                         }
                         .buttonStyle(.bordered)
-                        
-                        Button("delete all") {
-                            isLoading = true
-                            defer { isLoading = false }
+                        HStack {
+                            Button("insert") {
+                                let random = Int.random(in: 1...100)
+                                let ins: Instrument = .init(id: random, name: currentWord.word, type: currentWord.type, phonetic: currentWord.phonetic ?? "", meaning: currentWord.meaning)
+                                Task {
+                                    await insertInstrument(ins)
+                                }
+                            }
+                            .buttonStyle(.bordered)
                             
-                            Task {
-                                await deleteAllRow()
+                            Button("update") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                Task {
+                                    await updateData()
+                                }
                             }
-                        }
-                        .buttonStyle(.bordered)
-                        
-                        Button("inquiry") {
-                            isLoading = true
-                            defer { isLoading = false }
+                            .buttonStyle(.bordered)
                             
-                            Task {
-                                await inquiryWordInfor(dataInput)
+                            Button("delete all") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                Task {
+                                    await deleteAllRow()
+                                }
                             }
+                            .buttonStyle(.bordered)
+                            
+                            Button("inquiry") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                Task {
+                                    await inquiryWordInfor(dataInput)
+                                }
+                            }
+                            .buttonStyle(.bordered)
                         }
-                        .buttonStyle(.bordered)
                     }
                 }
             }
@@ -95,8 +111,8 @@ struct ContentView: View {
             isLoading = true
             defer { isLoading = false }
             
-            try await supabase.from("instruments").insert(instrument).select().execute()
-            await fetchInstruments()
+            try await supabase.from("vocabulary").insert(instrument).select().execute()
+            await fetchVocabulary()
             
             dataInput = ""
         } catch {
@@ -104,9 +120,9 @@ struct ContentView: View {
         }
     }
     
-    private func fetchInstruments() async {
+    private func fetchVocabulary() async {
         do {
-            instruments = try await supabase.from("instruments").select().execute().value
+            vocabulary = try await supabase.from("vocabulary").select().execute().value
         } catch {
             dump(error)
         }
@@ -115,11 +131,11 @@ struct ContentView: View {
     private func removeInstrument() async {
         do {
             try await supabase
-              .from("instruments")
+              .from("vocabulary")
               .delete()
               .eq("id", value: 7)
               .execute()
-            await fetchInstruments()
+            await fetchVocabulary()
         } catch {
             dump(error)
         }
@@ -128,7 +144,7 @@ struct ContentView: View {
     private func updateData() async {
         do {
             try await supabase
-              .from("instruments")
+              .from("vocabulary")
               .update(["name": "concac"])
               .eq("id", value: 7)
               .execute()
@@ -140,7 +156,7 @@ struct ContentView: View {
     private func deleteAllRow() async {
         do {
             try await supabase
-              .from("instruments")
+              .from("vocabulary")
               .delete()
               .gte("id", value: 0)
               .execute()
@@ -159,18 +175,9 @@ struct ContentView: View {
         do {
             let url = "\(apiDictionaryUrl)\(word.lowercased())"
             let data = try await NetworkManager.shared.request(url: url)
-            let jsonString = String(data: data, encoding: .utf8) ?? "Invalid Data"
-            
-            
-            do {
-                let decoder = JSONDecoder()
-                let words = try decoder.decode([WordModel].self, from: data)
-                print(words)
-            } catch {
-                print("Error decoding JSON: \(error)")
-            }
-
-            
+            let decoder = JSONDecoder()
+            let words = try decoder.decode([WordModel].self, from: data)
+            self.currentWord = words.first ?? .init(.null)
         } catch {
             dump(error)
         }
