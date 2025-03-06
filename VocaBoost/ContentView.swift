@@ -10,22 +10,25 @@ import Supabase
 import AVFoundation
 
 struct ContentView: View {
-    @State private var vocabulary: [Instrument] = []
+    @State private var vocabulary: [Vocab] = []
     @State private var isLoading: Bool = false
     @State private var dataInput: String = ""
     @State private var currentWord: WordModel = .init(.null)
+    @State private var selectedWord: Vocab?
     
     private let synthesizer = AVSpeechSynthesizer()
     
     var body: some View {
         ZStack {
             VStack {
-                TextField("abc", text: $dataInput).padding()
+                Spacer()
+                
+                TextField("input your fucking word", text: $dataInput).padding()
                 
                 List(vocabulary) { word in
                     HStack {
                         Button(action: {
-                            
+                            selectedWord = word
                         }) {
                             Text(word.name + " " + (word.phonetic ?? "")).foregroundColor(.black)
                         }
@@ -40,7 +43,6 @@ struct ContentView: View {
                             }
                     }
                 }
-                .listRowSeparator(.hidden)
                 .overlay {
                     if isLoading {
                         ProgressView()
@@ -49,6 +51,9 @@ struct ContentView: View {
                 .task {
                     await fetchVocabulary()
                 }
+                .sheet(item: $selectedWord, content: { item in
+                    DetailWordView(word: selectedWord).presentationDetents([.medium])
+                })
                 .safeAreaInset(edge: .bottom) {
                     VStack {
                         Button("reload") {
@@ -63,9 +68,9 @@ struct ContentView: View {
                         HStack {
                             Button("insert") {
                                 let random = Int.random(in: 1...100)
-                                let ins: Instrument = .init(id: random, name: currentWord.word, type: currentWord.type, phonetic: currentWord.phonetic ?? "", meaning: currentWord.meaning)
+                                let ins: Vocab = .init(id: random, name: currentWord.word, type: currentWord.type, phonetic: currentWord.phonetic ?? "", meaning: currentWord.meaning)
                                 Task {
-                                    await insertInstrument(ins)
+                                    await insertVocab(ins)
                                 }
                             }
                             .buttonStyle(.bordered)
@@ -106,12 +111,12 @@ struct ContentView: View {
         }
     }
     
-    private func insertInstrument(_ instrument: Instrument) async {
+    private func insertVocab(_ Vocab: Vocab) async {
         do {
             isLoading = true
             defer { isLoading = false }
             
-            try await supabase.from("vocabulary").insert(instrument).select().execute()
+            try await supabase.from("vocabulary").insert(Vocab).select().execute()
             await fetchVocabulary()
             
             dataInput = ""
@@ -128,7 +133,7 @@ struct ContentView: View {
         }
     }
     
-    private func removeInstrument() async {
+    private func removeVocab() async {
         do {
             try await supabase
               .from("vocabulary")
