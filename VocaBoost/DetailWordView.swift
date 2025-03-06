@@ -14,7 +14,7 @@ struct DetailWordView: View {
         ZStack {
             VStack {
                 Text(word?.name ?? "")
-                Text(word?.meaning ?? "")
+                Text(word?.meaning ?? "") 
                 Text(word?.type ?? "")
                 Text(word?.phonetic ?? "")
             }
