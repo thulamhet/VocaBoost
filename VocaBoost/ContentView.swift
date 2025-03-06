@@ -8,6 +8,7 @@
 import SwiftUI
 import Supabase
 import AVFoundation
+import GoogleSignIn
 
 struct ContentView: View {
     @State private var vocabulary: [Vocab] = []
@@ -56,15 +57,31 @@ struct ContentView: View {
                 })
                 .safeAreaInset(edge: .bottom) {
                     VStack {
-                        Button("reload") {
-                            isLoading = true
-                            defer { isLoading = false }
-                            
-                            Task {
-                                await fetchVocabulary()
+                        HStack {
+                            Button("reload") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                Task {
+                                    await fetchVocabulary()
+                                }
                             }
+                            .buttonStyle(.bordered)
+                            
+                            Button("google signin") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                Task {
+                                    do {
+                                        try await googleSignIn()
+                                    } catch {
+                                        dump(error)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.bordered)
                         }
-                        .buttonStyle(.bordered)
                         HStack {
                             Button("insert") {
                                 let random = Int.random(in: 1...100)
@@ -110,6 +127,30 @@ struct ContentView: View {
             }
         }
     }
+    
+    func googleSignIn() async throws {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+        let rootViewController = windowScene.windows.first?.rootViewController else {
+            return
+        }
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+
+        guard let idToken = result.user.idToken?.tokenString else {
+          print("No idToken found.")
+          return
+        }
+
+        let accessToken = result.user.accessToken.tokenString
+
+        try await supabase.auth.signInWithIdToken(
+          credentials: OpenIDConnectCredentials(
+            provider: .google,
+            idToken: idToken,
+            accessToken: accessToken
+          )
+        )
+      }
+    
     
     private func insertVocab(_ Vocab: Vocab) async {
         do {
