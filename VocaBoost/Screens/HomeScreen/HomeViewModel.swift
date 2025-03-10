@@ -71,7 +71,9 @@ final class HomeViewModel: ObservableObject {
         
         let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data, let loadedImage = UIImage(data: data) {
-                self.avatarImage = loadedImage
+                DispatchQueue.main.async {
+                    self.avatarImage = loadedImage
+                }
             }
         }
         task.resume()

@@ -56,9 +56,13 @@ struct ErrorPopupView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .background(Color.black.opacity(errorManager.showError ? 0.3 : 0).ignoresSafeArea())
+            .onTapGesture {
+                withAnimation {
+                    errorManager.showError.toggle()
+                }
+            }
         }
     }
-
 }
 
 struct ContentView: View {
