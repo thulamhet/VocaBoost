@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  VocaBoost
 //
 //  Created by Nguyễn Công Thư on 27/2/25.
@@ -10,18 +10,35 @@ import Supabase
 import AVFoundation
 import GoogleSignIn
 
-struct ContentView: View {
+struct HomeView: View {
+    
     @State private var vocabulary: [Vocab] = []
     @State private var isLoading: Bool = false
     @State private var dataInput: String = ""
     @State private var currentWord: WordModel = .init(.null)
     @State private var selectedWord: Vocab?
+    @State private var user: User?
+    @State private var avatarImage: UIImage?
     
     private let synthesizer = AVSpeechSynthesizer()
     
     var body: some View {
         ZStack {
             VStack {
+                HStack {
+                    if let image = avatarImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .cornerRadius(100)
+                    }
+                    VStack {
+                        Text(user?.fullName ?? "").bold()
+                        Text(user?.email ?? "").bold()
+                    }
+                }.padding(15)
+                
                 Spacer()
                 
                 TextField("input your fucking word", text: $dataInput).padding()
@@ -62,9 +79,7 @@ struct ContentView: View {
                                 isLoading = true
                                 defer { isLoading = false }
                                 
-                                Task {
-                                    await fetchVocabulary()
-                                }
+                                getUserInfor()
                             }
                             .buttonStyle(.bordered)
                             
@@ -121,11 +136,36 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.bordered)
+                            
+                            Button("inquiry") {
+                                isLoading = true
+                                defer { isLoading = false }
+                                
+                                onAppear()
+                            }
+                            .buttonStyle(.bordered)
                         }
                     }
                 }
             }
+        }.task {
+            refreshToken()
         }
+    }
+    
+    private func loadImage(url: URL) {
+        let task = URLSession.shared.dataTask(with: url) { data, _, _ in
+            if let data = data, let loadedImage = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.avatarImage = loadedImage
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    private func onAppear() {
+        refreshToken()
     }
     
     func googleSignIn() async throws {
@@ -136,20 +176,59 @@ struct ContentView: View {
         let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
 
         guard let idToken = result.user.idToken?.tokenString else {
-          print("No idToken found.")
-          return
+            print("No idToken found.")
+            return
         }
 
         let accessToken = result.user.accessToken.tokenString
+        do {
+            let result = try await supabase.auth.signInWithIdToken(
+                credentials: OpenIDConnectCredentials(provider: .google,idToken: idToken,accessToken: accessToken)
+            )
+            
+            UserDefaults.standard.set(result.accessToken, forKey: "supabase_access_token")
+            UserDefaults.standard.set(result.refreshToken, forKey: "supabase_refresh_token")
+        } catch {
+            dump(error)
+        }
+        getUserInfor()
+    }
+    
+    private func refreshToken() {
+        Task {
+            if let refreshToken = UserDefaults.standard.string(forKey: "supabase_refresh_token") {
+//                let newSession = try await supabase.auth.refreshSession(refreshToken: refreshToken)
+                let accessToken = UserDefaults.standard.string(forKey: "supabase_access_token")
+                let refreshToken = UserDefaults.standard.string(forKey: "supabase_refresh_token")
+                
+                try await supabase.auth.setSession(accessToken: accessToken ?? "", refreshToken: refreshToken ?? "")
+//                UserDefaults.standard.set(newSession.accessToken, forKey: "supabase_access_token")
+//                UserDefaults.standard.set(newSession.refreshToken, forKey: "supabase_refresh_token")
+                getUserInfor()
+            }
+        }
 
-        try await supabase.auth.signInWithIdToken(
-          credentials: OpenIDConnectCredentials(
-            provider: .google,
-            idToken: idToken,
-            accessToken: accessToken
-          )
-        )
-      }
+    }
+    
+    private func getUserInfor() {
+        if let user = GIDSignIn.sharedInstance.currentUser {
+            let userId: String = user.userID ?? ""
+            let idToken: String = user.accessToken.tokenString
+            let fullName: String = user.profile?.name ?? ""
+            let email: String = user.profile?.email ?? ""
+            
+            if let profilePic: URL = user.profile?.imageURL(withDimension: 200) {
+                loadImage(url: profilePic)
+                self.user = User(
+                    userId: userId,
+                    idToken: idToken,
+                    fullName: fullName,
+                    email: email,
+                    profilePic: profilePic
+                )
+            }
+        }
+    }
     
     
     private func insertVocab(_ Vocab: Vocab) async {
@@ -231,5 +310,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    HomeView()
 }
