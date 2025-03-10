@@ -14,7 +14,7 @@ struct DetailWordView: View {
         ZStack {
             VStack {
                 Text(word?.name ?? "")
-                Text(word?.meaning ?? "")
+                Text(word?.meaning ?? "") 
                 Text(word?.type ?? "")
                 Text(word?.phonetic ?? "")
             }
@@ -23,5 +23,13 @@ struct DetailWordView: View {
 }
 
 #Preview {
-    DetailWordView()
+    DetailWordView(
+        word: Vocab(
+            id: 1,
+            name: "123",
+            type: "verb",
+            phonetic: "zxc",
+            meaning: "ascasca"
+        )
+    )
 }
