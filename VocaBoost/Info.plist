@@ -47,17 +47,27 @@
 	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
-    
-    <key>GIDClientID</key>
-    <string>128400548152-3j6uil2efthahnaq75us42ktp0dro2cr.apps.googleusercontent.com</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-      <dict>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>com.googleusercontent.apps.128400548152-3j6uil2efthahnaq75us42ktp0dro2cr</string>
-        </array>
-      </dict>
-    </array>
+	<key>GIDClientID</key>
+	<string>128400548152-3j6uil2efthahnaq75us42ktp0dro2cr.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.128400548152-3j6uil2efthahnaq75us42ktp0dro2cr</string>
+			</array>
+		</dict>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SVN-Gilroy Regular.otf</string>
+		<string>SVN-Gilroy SemiBold.otf</string>
+		<string>SVN-Gilroy Medium.otf</string>
+		<string>SVN-Gilroy Light.otf</string>
+		<string>SVN-Gilroy Bold.otf</string>
+		<string>SVN-Gilroy Bold Italic.otf</string>
+		<string>ShareTechMono-Regular.ttf</string>
+		<string>Inconsolata.ttf</string>
+	</array>
 </dict>
 </plist>

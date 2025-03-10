@@ -28,7 +28,7 @@ struct WordModel: Codable {
             id: random,
             name: word,
             type: type,
-            phonetic: phonetic,
+            phonetic: phonetic?.formatPhonetic,
             meaning: meaning
         )
         return voc

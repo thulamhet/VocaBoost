@@ -19,7 +19,7 @@ final class HomeViewModel: ObservableObject {
     @Published var user: User?
     @Published var avatarImage: UIImage?
     
-    private let synthesizer = AVSpeechSynthesizer()
+    private lazy var synthesizer = AVSpeechSynthesizer()
     
     @MainActor
     func googleSignIn() async {
@@ -34,30 +34,10 @@ final class HomeViewModel: ObservableObject {
                 print("No idToken found.")
                 return
             }
-
-//            let accessToken = result.user.accessToken.tokenString
         } catch {
             dump(error)
         }
         getUserInfor()
-    }
-    
-    func refreshToken() async {
-        do {
-            if let refreshToken = UserDefaults.standard.string(forKey: "supabase_refresh_token") {
-                //                let newSession = try await supabase.auth.refreshSession(refreshToken: refreshToken)
-                let accessToken = UserDefaults.standard.string(forKey: "supabase_access_token")
-                let refreshToken = UserDefaults.standard.string(forKey: "supabase_refresh_token")
-                
-                try await supabase.auth.setSession(accessToken: accessToken ?? "", refreshToken: refreshToken ?? "")
-                //                UserDefaults.standard.set(newSession.accessToken, forKey: "supabase_access_token")
-                //                UserDefaults.standard.set(newSession.refreshToken, forKey: "supabase_refresh_token")
-                await getUserInfor()
-            }
-        } catch {
-            dump(error)
-        }
-
     }
     
     @MainActor
@@ -84,15 +64,14 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func loadImage(url: URL) {
         isLoading = true
         defer { isLoading = false }
         
         let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data, let loadedImage = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    self.avatarImage = loadedImage
-                }
+                self.avatarImage = loadedImage
             }
         }
         task.resume()
@@ -191,7 +170,9 @@ final class HomeViewModel: ObservableObject {
             self.currentWord = words.first ?? .init(.null)
             return words.first
         } catch {
+            ErrorManager.showErrorPopup(error.localizedDescription)
             dump(error)
+            
         }
         return nil
     }

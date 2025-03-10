@@ -13,31 +13,25 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
+            CustomBackgroundView().ignoresSafeArea()
             VStack {
-                HStack {
-                    if let image = viewModel.avatarImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(100)
-                    }
-                    VStack {
-                        Text(viewModel.user?.fullName ?? "").bold()
-                        Text(viewModel.user?.email ?? "").bold()
-                    }
-                }.padding(15)
+                GilroyText("VocaBoost", fontSize: 40, weight: .bold)
+                    .foregroundStyle(LinearGradient(colors: [.customGrayLight, .customGrayMedium], startPoint: .top, endPoint: .bottom))
                 
-                Spacer()
-                
-                TextField("input your fucking word", text: $viewModel.dataInput).padding()
+                TextField("input your fucking word", text: $viewModel.dataInput)
+                    .padding(20)
+                    .background(.white)
+                    .cornerRadius(20)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
                 
                 List(viewModel.vocabulary) { word in
                     HStack {
                         Button(action: {
                             viewModel.selectedWord = word
                         }) {
-                            Text(word.name + " " + (word.phonetic ?? "")).foregroundColor(.black)
+                            GilroyText(word.name + " " + (word.phonetic ?? "")).foregroundColor(.black)
                         }
                         
                         Spacer()
@@ -66,46 +60,54 @@ struct HomeView: View {
                 .safeAreaInset(edge: .bottom) {
                     VStack {
                         HStack {
-                            Button("reload") {
-                                viewModel.getUserInfor()
-                            }
-                            .buttonStyle(.bordered)
-                            
-                            Button("google signin") {
+                            Button(action: {
                                 Task {
                                     await viewModel.googleSignIn()
                                 }
+                            }) {
+                                HStack {
+                                    Image("google")
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(.white)
+                                    
+                                    GilroyText("Sign in with Google", fontSize: 15, color: .white)
+                                }
+                                .frame(height: 50)
+                                .padding(.horizontal, 20)
+                                .background(Color.customGrayLight)
+                                .cornerRadius(10)
                             }
-                            .buttonStyle(.bordered)
-                        }
-                        HStack {
-                            Button("insert") {
+                            
+                            Button(action: {
                                 Task {
                                     await viewModel.insertVocab()
                                 }
+                            }) {
+                                GilroyText("Insert", fontSize: 15, color: .white)
+                                    .foregroundColor(.white)
                             }
-                            .buttonStyle(.bordered)
-                            
-                            
-                            Button("inquiry") {
-                                Task {
-                                    await viewModel.refreshToken()
-                                }
-                            }
-                            .buttonStyle(.bordered)
+                            .frame(height: 50)
+                            .padding(.horizontal, 20)
+                            .background(Color.customGrayLight)
+                            .cornerRadius(10)
                         }
                     }
                 }
+            }.onTapGesture {
+                hideKeyboard()
             }
+            ErrorPopupView()
         }
     }
-    
-    private func onAppear() {
-        Task {
-            await viewModel.refreshToken()
-        }
+}
+
+struct DetailView: View {
+    var body: some View {
+        Text("Detail Screen")
+            .navigationTitle("Details")
+            .navigationBarTitleDisplayMode(.inline)
     }
-    
 }
 
 #Preview {
