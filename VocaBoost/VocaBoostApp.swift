@@ -11,7 +11,7 @@ import SwiftUI
 struct VocaBoostApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            HomeView(viewModel: .init())
         }
     }
 }

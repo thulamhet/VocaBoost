@@ -10,6 +10,7 @@
 *.resolved
 project.xcworkspace/
 xcuserdata/
+*.xcbkptlist
 
 # Generated files
 *.o
