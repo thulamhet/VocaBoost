@@ -29,11 +29,17 @@ final class HomeViewModel: ObservableObject {
         }
         do {
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-
-            guard (result.user.idToken?.tokenString) != nil else {
+            guard let idToken = result.user.idToken?.tokenString else {
                 print("No idToken found.")
                 return
             }
+            
+            let session = try await supabase.auth.signInWithIdToken(credentials: .init(provider: .google, idToken: idToken))
+            let accessToken = session.accessToken
+            let refreshToken = session.refreshToken
+
+            UserDefaults.standard.set(accessToken, forKey: "accessToken")
+            UserDefaults.standard.set(refreshToken, forKey: "refreshToken")
         } catch {
             dump(error)
         }
@@ -62,6 +68,10 @@ final class HomeViewModel: ObservableObject {
                 )
             }
         }
+    }
+    
+    func saveSession() {
+        
     }
     
     @MainActor
