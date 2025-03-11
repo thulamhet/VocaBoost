@@ -6,3 +6,4 @@
 //
 
 let apiDictionaryUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+let libreTranslateUrl = "https://libretranslate.com/translate"

@@ -108,7 +108,9 @@ struct HomeView: View {
                             .cornerRadius(10)
                             
                             Button(action: {
-                                viewModel.getUserInfor()
+                                Task {
+                                    await viewModel.queryVietnameseWord()
+                                }
                             }) {
                                 GilroyText("Get session", fontSize: 15, color: .white)
                                     .foregroundColor(.white)
