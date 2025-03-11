@@ -15,8 +15,20 @@ struct HomeView: View {
         ZStack {
             CustomBackgroundView().ignoresSafeArea()
             VStack {
-                GilroyText("VocaBoost", fontSize: 40, weight: .bold)
-                    .foregroundStyle(LinearGradient(colors: [.customGrayLight, .customGrayMedium], startPoint: .top, endPoint: .bottom))
+                ZStack {
+                    if let image = viewModel.avatarImage {
+                        HStack {
+                            Image(uiImage: image)
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .cornerRadius(20)
+                                .padding(.leading, 20)
+                            Spacer()
+                        }
+                    }
+                    GilroyText("VocaBoost", fontSize: 40, weight: .bold)
+                        .foregroundStyle(LinearGradient(colors: [.customGrayLight, .customGrayMedium], startPoint: .top, endPoint: .bottom)).frame(maxWidth: .infinity, alignment: .center)
+                }
                 
                 TextField("input your fucking word", text: $viewModel.dataInput)
                     .padding(20)
@@ -25,6 +37,7 @@ struct HomeView: View {
                     .padding(.leading, 20)
                     .padding(.trailing, 20)
                     .padding(.bottom, 20)
+                    .font(.custom("SVN-Gilroy", size: 16))
                 
                 List(viewModel.vocabulary) { word in
                     HStack {
@@ -94,9 +107,10 @@ struct HomeView: View {
                         }
                     }
                 }
-            }.onTapGesture {
-                hideKeyboard()
             }
+//            .onTapGesture {
+//                hideKeyboard()
+//            }
             ErrorPopupView()
         }
     }
