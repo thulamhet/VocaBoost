@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class ErrorManager: ObservableObject {
+final class ErrorManager: ObservableObject {
     static let shared = ErrorManager()
 
     @Published var showError: Bool = false

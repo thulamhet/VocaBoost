@@ -29,11 +29,17 @@ final class HomeViewModel: ObservableObject {
         }
         do {
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-
-            guard (result.user.idToken?.tokenString) != nil else {
+            guard let idToken = result.user.idToken?.tokenString else {
                 print("No idToken found.")
                 return
             }
+            
+            let session = try await supabase.auth.signInWithIdToken(credentials: .init(provider: .google, idToken: idToken))
+            let accessToken = session.accessToken
+            let refreshToken = session.refreshToken
+
+            UserDefaults.standard.set(accessToken, forKey: "accessToken")
+            UserDefaults.standard.set(refreshToken, forKey: "refreshToken")
         } catch {
             dump(error)
         }
@@ -62,6 +68,10 @@ final class HomeViewModel: ObservableObject {
                 )
             }
         }
+    }
+    
+    func saveSession() {
+        
     }
     
     @MainActor
@@ -170,12 +180,44 @@ final class HomeViewModel: ObservableObject {
             let decoder = JSONDecoder()
             let words = try decoder.decode([WordModel].self, from: data)
             self.currentWord = words.first ?? .init(.null)
-            return words.first
+            self.currentWord.json = convertDataToJSONString(data)
+            return self.currentWord
         } catch {
             ErrorManager.showErrorPopup(error.localizedDescription)
             dump(error)
-            
         }
         return nil
+    }
+    
+    func convertDataToJSONString(_ data: Data) -> String? {
+        if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+           let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        }
+        return nil
+    }
+    
+    @MainActor
+    func queryVietnameseWord() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let url = libreTranslateUrl
+            let body: [String: Any] = [
+                "q": "elevate",
+                "source": "en",
+                "target": "vi",
+                "format": "text",
+                "alternatives": 3,
+                "api_key": ""
+            ]
+            let data = try await NetworkManager.shared.request(url: url, method: .post, body: body)
+            print(data)
+        } catch {
+            ErrorManager.showErrorPopup(error.localizedDescription)
+            dump(error)
+        }
     }
 }

@@ -13,7 +13,8 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            CustomBackgroundView().ignoresSafeArea()
+//            CustomBackgroundView().ignoresSafeArea()
+            Color.init(hex: "#C3CEDA").ignoresSafeArea()
             VStack {
                 ZStack {
                     if let image = viewModel.avatarImage {
@@ -26,7 +27,7 @@ struct HomeView: View {
                             Spacer()
                         }
                     }
-                    GilroyText("VocaBoost", fontSize: 40, weight: .bold)
+                    GilroyText("VocaBoost", fontSize: 40, color: Color.init(hex: "#071330"), weight: .bold)
                         .foregroundStyle(LinearGradient(colors: [.customGrayLight, .customGrayMedium], startPoint: .top, endPoint: .bottom)).frame(maxWidth: .infinity, alignment: .center)
                 }
                 
@@ -38,13 +39,14 @@ struct HomeView: View {
                     .padding(.trailing, 20)
                     .padding(.bottom, 20)
                     .font(.custom("SVN-Gilroy", size: 16))
+                    .foregroundStyle(Color.midnightBlue)
                 
                 List(viewModel.vocabulary) { word in
                     HStack {
                         Button(action: {
                             viewModel.selectedWord = word
                         }) {
-                            GilroyText(word.name + " " + (word.phonetic ?? "")).foregroundColor(.black)
+                            GilroyText(word.name + " " + (word.phonetic ?? ""), color: Color.midnightBlue)
                         }
                         
                         Spacer()
@@ -88,7 +90,7 @@ struct HomeView: View {
                                 }
                                 .frame(height: 50)
                                 .padding(.horizontal, 20)
-                                .background(Color.customGrayLight)
+                                .background(Color.darkBlue)
                                 .cornerRadius(10)
                             }
                             
@@ -102,7 +104,20 @@ struct HomeView: View {
                             }
                             .frame(height: 50)
                             .padding(.horizontal, 20)
-                            .background(Color.customGrayLight)
+                            .background(Color.darkBlue)
+                            .cornerRadius(10)
+                            
+                            Button(action: {
+                                Task {
+                                    await viewModel.queryVietnameseWord()
+                                }
+                            }) {
+                                GilroyText("Get session", fontSize: 15, color: .white)
+                                    .foregroundColor(.white)
+                            }
+                            .frame(height: 50)
+                            .padding(.horizontal, 20)
+                            .background(Color.darkBlue)
                             .cornerRadius(10)
                         }
                     }

@@ -22,14 +22,14 @@ struct DetailWordView: View {
     }
 }
 
-#Preview {
-    DetailWordView(
-        word: Vocab(
-            id: 1,
-            name: "123",
-            type: "verb",
-            phonetic: "zxc",
-            meaning: "ascasca"
-        )
-    )
-}
+//#Preview {
+//    DetailWordView(
+//        word: Vocab(
+//            id: 1,
+//            name: "123",
+//            type: "verb",
+//            phonetic: "zxc",
+//            meaning: "ascasca"
+//        )
+//    )
+//}

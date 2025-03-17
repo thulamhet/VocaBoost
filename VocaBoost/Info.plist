@@ -34,7 +34,9 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UILaunchScreen</key>
-		<dict/>
+		<string></string>
+		<key>UIImageName</key>
+		<string></string>
 	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>

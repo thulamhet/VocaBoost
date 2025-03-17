@@ -17,6 +17,11 @@ extension Color {
     static let customIndigoMedium = Color("ColorIndigoMedium")
     static let customSalmonLight = Color("ColorSalmonLight")
     
+    static let mistyBlue = Color.init(hex: "#c3ceda")
+    static let blueGray = Color.init(hex: "#738fa7")
+    static let midnightBlue = Color.init(hex: "#0c4160")
+    static let darkBlue = Color.init(hex: "#071330")
+    
     init(hex: String) {
         let hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         let scanner = Scanner(string: hexSanitized)
