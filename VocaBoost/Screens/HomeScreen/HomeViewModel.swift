@@ -8,8 +8,11 @@ import Supabase
 import AVFoundation
 import GoogleSignIn
 import Combine
+import CoreData
 
 final class HomeViewModel: ObservableObject {
+    
+    let container: NSPersistentContainer
     
     @Published var vocabulary: [Vocab] = []
     @Published var isLoading: Bool = false
@@ -20,6 +23,14 @@ final class HomeViewModel: ObservableObject {
     @Published var avatarImage: UIImage?
     
     private lazy var synthesizer = AVSpeechSynthesizer()
+    
+    init() {
+        container = NSPersistentContainer(name: "VocabsContainer")
+        container.loadPersistentStores { _, _ in }
+    }
+    
+    func fetchVocabs() {
+    }
     
     @MainActor
     func googleSignIn() async {
