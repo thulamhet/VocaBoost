@@ -14,6 +14,7 @@ struct WordModel: Codable {
     let license: License
     let sourceUrls: [String]
     var json: String?
+    var userId: String?
     
     var meaning: String {
         meanings.first?.definitions.first?.definition ?? ""
@@ -31,7 +32,8 @@ struct WordModel: Codable {
             type: type,
             phonetic: phonetic?.formatPhonetic,
             meaning: meaning,
-            json: json
+            json: json,
+            userId: userId
         )
         return voc
     }

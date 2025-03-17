@@ -12,5 +12,6 @@ struct Vocab: Decodable, Identifiable, Encodable {
     let phonetic: String?
     let meaning: String?
     let json: String?
+    let userId: String?
 }
 
