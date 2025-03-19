@@ -40,8 +40,10 @@ struct HomeView: View {
                     .font(.custom("SVN-Gilroy", size: 16))
                     .foregroundStyle(Color.midnightBlue)
                 
-                List(viewModel.savedVocabulary) { word in
-                    GilroyText((word.name ?? "") + " " + (word.phonetic ?? ""), color: Color.midnightBlue)
+                List {
+                    ForEach(viewModel.savedVocabulary) { word in
+                        GilroyText((word.name ?? "") + " " + (word.phonetic ?? ""), color: Color.midnightBlue)
+                    }.onDelete(perform: viewModel.deleteVocabFromLocal)
                 }
                 
                 List(viewModel.vocabulary) { word in

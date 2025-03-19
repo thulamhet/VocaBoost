@@ -32,7 +32,7 @@ final class HomeViewModel: ObservableObject {
     }
     
     func fetchVocabsFromLocal() {
-        let request = NSFetchRequest<VocabEntity>(entityName: "VocabEntity")
+        let request = VocabEntity.fetchRequest()
         do {
             savedVocabulary = try container.viewContext.fetch(request)
         } catch {
@@ -41,6 +41,10 @@ final class HomeViewModel: ObservableObject {
     }
     
     func addVocabToLocal(_ vocab: Vocab) {
+        if isVocabExist(id: vocab.id.string) {
+            return
+        }
+        
         let newVocab = VocabEntity(context: container.viewContext)
         newVocab.with {
             $0.id = vocab.id
@@ -50,6 +54,25 @@ final class HomeViewModel: ObservableObject {
             $0.type = vocab.type
         }
         saveToLocal()
+    }
+    
+    func deleteVocabFromLocal(_ indexSet: IndexSet) {
+        guard let index = indexSet.first else { return }
+        let entity = savedVocabulary[index]
+        container.viewContext.delete(entity)
+        saveToLocal()
+    }
+    
+    private func isVocabExist(id: String) -> Bool {
+        let request = VocabEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id)
+        do {
+            let vocabs = try container.viewContext.fetch(request)
+            return !vocabs.isEmpty
+        } catch {
+            dump(error)
+        }
+        return false
     }
     
     private func saveToLocal() {
