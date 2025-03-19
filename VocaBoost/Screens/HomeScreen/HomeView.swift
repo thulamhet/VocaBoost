@@ -11,9 +11,8 @@ struct HomeView: View {
     
     @StateObject var viewModel: HomeViewModel
     
-    var body: some View {
+    var body: some View {   
         ZStack {
-//            CustomBackgroundView().ignoresSafeArea()
             Color.init(hex: "#C3CEDA").ignoresSafeArea()
             VStack {
                 ZStack {
@@ -41,10 +40,15 @@ struct HomeView: View {
                     .font(.custom("SVN-Gilroy", size: 16))
                     .foregroundStyle(Color.midnightBlue)
                 
+                List(viewModel.savedVocabulary) { word in
+                    GilroyText((word.name ?? "") + " " + (word.phonetic ?? ""), color: Color.midnightBlue)
+                }
+                
                 List(viewModel.vocabulary) { word in
                     HStack {
                         Button(action: {
                             viewModel.selectedWord = word
+                            viewModel.addVocabToLocal(word)
                         }) {
                             GilroyText(word.name + " " + (word.phonetic ?? ""), color: Color.midnightBlue)
                         }
@@ -59,6 +63,8 @@ struct HomeView: View {
                             }
                     }
                 }
+                
+                
                 .overlay {
                     if viewModel.isLoading {
                         ProgressView()

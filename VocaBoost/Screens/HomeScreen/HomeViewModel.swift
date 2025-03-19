@@ -21,15 +21,44 @@ final class HomeViewModel: ObservableObject {
     @Published var selectedWord: Vocab?
     @Published var user: User?
     @Published var avatarImage: UIImage?
+    @Published var savedVocabulary: [VocabEntity] = []
     
     private lazy var synthesizer = AVSpeechSynthesizer()
     
     init() {
         container = NSPersistentContainer(name: "VocabsContainer")
         container.loadPersistentStores { _, _ in }
+        fetchVocabsFromLocal()
     }
     
-    func fetchVocabs() {
+    func fetchVocabsFromLocal() {
+        let request = NSFetchRequest<VocabEntity>(entityName: "VocabEntity")
+        do {
+            savedVocabulary = try container.viewContext.fetch(request)
+        } catch {
+            dump(error)
+        }
+    }
+    
+    func addVocabToLocal(_ vocab: Vocab) {
+        let newVocab = VocabEntity(context: container.viewContext)
+        newVocab.with {
+            $0.id = vocab.id
+            $0.meaning = vocab.meaning
+            $0.name = vocab.name
+            $0.phonetic = vocab.phonetic
+            $0.type = vocab.type
+        }
+        saveToLocal()
+    }
+    
+    private func saveToLocal() {
+        do {
+            try container.viewContext.save()
+            fetchVocabsFromLocal()
+        } catch {
+            dump(error)
+        }
     }
     
     @MainActor
@@ -79,10 +108,6 @@ final class HomeViewModel: ObservableObject {
                 )
             }
         }
-    }
-    
-    func saveSession() {
-        
     }
     
     @MainActor

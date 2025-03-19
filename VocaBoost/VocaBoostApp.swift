@@ -23,7 +23,7 @@ struct VocaBoostApp: App {
                     try await supabase.auth.setSession(accessToken: accessToken, refreshToken: refreshToken)
                     print("✅ Session đã được khôi phục!")
                 } catch {
-                    print("❌ Không thể khôi phục session: \(error)")
+                    print("❌ Không thể khôi phục tsession: \(error)")
                 }
             }
         }
