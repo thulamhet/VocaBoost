@@ -11,7 +11,7 @@
 project.xcworkspace/
 xcuserdata/
 *.xcbkptlist
-
+*.Breakpoints_v2.xcbkptlist
 # Generated files
 *.o
 *.pyc
