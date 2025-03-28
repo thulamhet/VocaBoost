@@ -44,8 +44,8 @@ struct SplashScreenView: View {
             }
         }
         .fullScreenCover(isPresented: $isActive) {
-            HomeView(viewModel: .init())
-//            AuthView(viewModel: .init())
+            AuthView()
+//            HomeView()
                 .transition(.opacity) // Optional smooth transition
         }
     }

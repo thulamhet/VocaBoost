@@ -24,10 +24,9 @@ struct WordModel: Codable {
         meanings.first?.partOfSpeech ?? ""
     }
     
-    func toVocabModel() -> Vocab {
-        let random = Int.random(in: 1...100)
+    func toVocabModel(id: Int) -> Vocab {
         let voc: Vocab = .init(
-            id: random,
+            id: id,
             name: word,
             type: type,
             phonetic: phonetic?.formatPhonetic,

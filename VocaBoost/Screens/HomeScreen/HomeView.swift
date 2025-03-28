@@ -9,11 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @StateObject var viewModel: HomeViewModel
+    @StateObject var viewModel: HomeViewModel = .init()
     
     var body: some View {   
         ZStack {
             Color.init(hex: "#C3CEDA").ignoresSafeArea()
+            
             VStack {
                 ZStack {
                     if let image = viewModel.avatarImage {
@@ -65,8 +66,6 @@ struct HomeView: View {
                             }
                     }
                 }
-                
-                
                 .overlay {
                     if viewModel.isLoading {
                         ProgressView()
@@ -135,7 +134,7 @@ struct HomeView: View {
 //                hideKeyboard()
 //            }
             ErrorPopupView()
-        }
+        }.navigationBarBackButtonHidden(true)
     }
 }
 

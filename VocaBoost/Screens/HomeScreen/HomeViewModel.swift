@@ -27,7 +27,11 @@ final class HomeViewModel: ObservableObject {
     
     init() {
         container = NSPersistentContainer(name: "VocabsContainer")
-        container.loadPersistentStores { _, _ in }
+        container.loadPersistentStores { des, error in
+            if let error = error {
+                print("Core Data failed to load: \(error.localizedDescription)")
+            }
+        }
         fetchVocabsFromLocal()
     }
     
@@ -47,7 +51,6 @@ final class HomeViewModel: ObservableObject {
         
         let newVocab = VocabEntity(context: container.viewContext)
         newVocab.with {
-            $0.id = vocab.id
             $0.meaning = vocab.meaning
             $0.name = vocab.name
             $0.phonetic = vocab.phonetic
@@ -155,12 +158,15 @@ final class HomeViewModel: ObservableObject {
             defer { isLoading = false }
             
             if let word = await inquiryWordInfor() {
-                try await supabase.from("vocabulary").insert(word.toVocabModel()).select().execute()
+                // id is the order
+                let id = vocabulary.count + 1
+                try await supabase.from("vocabulary").insert(word.toVocabModel(id: id)).select().execute()
                 await fetchVocabulary()
             }
             
             dataInput = ""
         } catch {
+            ErrorManager.showErrorPopup(error.localizedDescription)
             dump(error)
         }
     }
@@ -173,6 +179,7 @@ final class HomeViewModel: ObservableObject {
         do {
             vocabulary = try await supabase.from("vocabulary").select().execute().value
         } catch {
+            ErrorManager.showErrorPopup(error.localizedDescription)
             dump(error)
         }
     }
