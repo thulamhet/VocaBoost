@@ -48,16 +48,18 @@ struct AuthView: View {
             .padding()
 
             ErrorPopupView()
-        }.overlay {
+        }
+        .overlay {
             if viewModel.isLoading {
                 ProgressView()
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
     
     func handleAuth() {
         Task {
-            try await viewModel.emailSignIn()
+            await viewModel.emailSignIn()
             if viewModel.isLogined {
                 path.append("HomeView")
             }
