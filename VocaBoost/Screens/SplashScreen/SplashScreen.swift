@@ -11,7 +11,9 @@ struct SplashScreenView: View {
     @State private var isActive = false
     @State private var opacity = 1.0
     @State private var scale: CGFloat = 1.0
-
+    @State private var path = NavigationPath()
+    @StateObject private var authViewModel = AuthViewModel()
+    
     var body: some View {
         ZStack {
             Color.init(hex: "#C3CEDA").ignoresSafeArea()
@@ -44,9 +46,13 @@ struct SplashScreenView: View {
             }
         }
         .fullScreenCover(isPresented: $isActive) {
-            AuthView()
-//            HomeView()
-                .transition(.opacity) // Optional smooth transition
+            NavigationStack(path: $path) {
+                AuthView(path: $path).navigationDestination(for: String.self) { value in
+                    if value == "HomeView" {
+                        HomeView(path: $path)
+                    }
+                }
+            }.environmentObject(authViewModel)
         }
     }
 }

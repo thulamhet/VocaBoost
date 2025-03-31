@@ -10,8 +10,10 @@ import SwiftUI
 struct HomeView: View {
     
     @StateObject var viewModel: HomeViewModel = .init()
+    @EnvironmentObject var authModel: AuthViewModel
+    @Binding var path: NavigationPath
     
-    var body: some View {   
+    var body: some View {
         ZStack {
             Color.init(hex: "#C3CEDA").ignoresSafeArea()
             
@@ -116,10 +118,13 @@ struct HomeView: View {
                             
                             Button(action: {
                                 Task {
-                                    await viewModel.queryVietnameseWord()
+                                    await authModel.signOut()
+                                    if !authModel.isLogined {
+                                        path.removeLast()
+                                    }
                                 }
                             }) {
-                                GilroyText("Get session", fontSize: 15, color: .white)
+                                GilroyText("Sign Out", fontSize: 15, color: .white)
                                     .foregroundColor(.white)
                             }
                             .frame(height: 50)
@@ -130,9 +135,6 @@ struct HomeView: View {
                     }
                 }
             }
-//            .onTapGesture {
-//                hideKeyboard()
-//            }
             ErrorPopupView()
         }.navigationBarBackButtonHidden(true)
     }
@@ -147,5 +149,7 @@ struct DetailView: View {
 }
 
 #Preview {
-    HomeView(viewModel: .init())
+    StatefulPreviewWrapper(NavigationPath()) { path in
+        HomeView(path: path)
+    }
 }

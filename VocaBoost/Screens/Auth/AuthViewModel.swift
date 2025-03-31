@@ -24,13 +24,29 @@ final class AuthViewModel: ObservableObject {
             defer { isLoading = false }
             
             if isLoginMode {
-                let response = try await supabase.auth.signIn(email: email, password: password)
-                print(response)
+                let session: Auth.Session = try await supabase.auth.signIn(email: email, password: password)
+                print("-- SIGN IN SUCCESS: \n", session)
+                KeychainService.saveSession(session.refreshToken)
                 isLogined = true
             } else {
                 try await supabase.auth.signUp(email: email, password: password)
                 message = "Sign Up Success! Check your email."
             }
+        } catch {
+            ErrorManager.showErrorPopup(error.localizedDescription)
+            dump(error)
+        }
+    }
+    
+    @MainActor
+    func signOut() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            try await supabase.auth.signOut()
+            print("-- SIGN OUT SUCCESS: \n")
+            isLogined = false
         } catch {
             ErrorManager.showErrorPopup(error.localizedDescription)
             dump(error)
