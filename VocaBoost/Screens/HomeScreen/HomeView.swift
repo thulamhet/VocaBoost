@@ -120,7 +120,7 @@ struct HomeView: View {
                                 Task {
                                     await authModel.signOut()
                                     if !authModel.isLogined {
-                                        path.removeLast()
+                                        path.append("AuthView")
                                     }
                                 }
                             }) {
@@ -136,7 +136,8 @@ struct HomeView: View {
                 }
             }
             ErrorPopupView()
-        }.navigationBarBackButtonHidden(true)
+        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

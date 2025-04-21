@@ -12,6 +12,7 @@ struct SplashScreenView: View {
     @State private var opacity = 1.0
     @State private var scale: CGFloat = 1.0
     @State private var path = NavigationPath()
+    
     @StateObject private var authViewModel = AuthViewModel()
     
     var body: some View {
@@ -47,12 +48,33 @@ struct SplashScreenView: View {
         }
         .fullScreenCover(isPresented: $isActive) {
             NavigationStack(path: $path) {
-                AuthView(path: $path).navigationDestination(for: String.self) { value in
-                    if value == "HomeView" {
+                Group {
+                    if authViewModel.isLogined {
                         HomeView(path: $path)
+                    } else {
+                        AuthView(path: $path)
                     }
                 }
-            }.environmentObject(authViewModel)
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(for: String.self, destination: { value in
+                    if value == "HomeView" {
+                        HomeView(path: $path)
+                    } else if value == "AuthView" {
+                        AuthView(path: $path)
+                    }
+                })
+            }
+            .environmentObject(authViewModel)
+        }
+        .onAppear {
+            Task {
+                await authViewModel.refreshSessionIfNeed()
+            }
+        }
+        .overlay {
+            if authViewModel.isLoading {
+                ProgressView()
+            }
         }
     }
 }
